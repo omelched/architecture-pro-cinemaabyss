@@ -30,4 +30,4 @@ async def list_movies():
 
 @app.get("/api/users/")
 async def list_users():
-    return JSONResponse()
+    return JSONResponse(await monolith.list_users())
