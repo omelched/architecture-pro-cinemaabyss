@@ -5,7 +5,7 @@ from aiokafka import AIOKafkaConsumer
 KAFKA_BROKERS = os.environ.get('KAFKA_BROKERS')
 
 async def consume():
-    consumer = AIOKafkaConsumer('movie', 'user', 'payment', bootstrap_servers=KAFKA_BROKERS)
+    consumer = AIOKafkaConsumer('movie-events', 'user-events', 'payment-events', bootstrap_servers=KAFKA_BROKERS)
     await consumer.start()
 
     try:

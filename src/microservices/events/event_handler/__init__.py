@@ -22,17 +22,17 @@ async def health():
 
 @app.post("/api/events/movie")
 async def product_movie(request: Request):
-    await produce("movie", json.dumps(await request.json()))
+    await produce("movie-events", json.dumps(await request.json()))
     return JSONResponse({"status": "success"}, status_code=201)
 
 
 @app.post("/api/events/user")
 async def product_user(request: Request):
-    await produce("user", json.dumps(await request.json()))
+    await produce("user-events", json.dumps(await request.json()))
     return JSONResponse({"status": "success"}, status_code=201)
 
 
 @app.post("/api/events/payment")
 async def product_payments(request: Request):
-    await produce("payment", json.dumps(await request.json()))
+    await produce("payment-events", json.dumps(await request.json()))
     return JSONResponse({"status": "success"}, status_code=201)
