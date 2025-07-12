@@ -8,7 +8,15 @@ from .providers import monolith, movies
 
 app = FastAPI()
 
+GRADUAL_MIGRATION = os.environ.get("GRADUAL_MIGRATION")
 MOVIES_MIGRATION_PERCENT = os.environ.get("MOVIES_MIGRATION_PERCENT")
+
+
+def is_routed_to_microservice() -> bool:
+    if not GRADUAL_MIGRATION == "true":
+        return True
+
+    return random.randint(0, 99) < int(MOVIES_MIGRATION_PERCENT)
 
 
 @app.get("/health/")
@@ -18,9 +26,7 @@ async def health_check():
 
 @app.get("/api/movies/")
 async def list_movies():
-    is_routed_to_microservice = random.randint(0, 99) < int(MOVIES_MIGRATION_PERCENT)
-
-    if is_routed_to_microservice:
+    if is_routed_to_microservice():
         movie_list = await monolith.list_movies()
     else:
         movie_list = await movies.list_movies()
