@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cinema-proxy"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = ["fastapi", "uvicorn", "httpx"]
+
+[tool.setuptools.packages.find]
+include = ["cinema_proxy*"]
+exclude = ["tmp*"]
+
+
+[tool.setuptools.package-data]
+"*" = ["*.html", "*.css", "*.js", "*.svg", "*.ico", "*.mo"]
