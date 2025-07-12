@@ -1,5 +1,6 @@
 import os
 import random
+from typing import Optional
 
 from fastapi import FastAPI, Response, Request
 from starlette.responses import JSONResponse
@@ -25,13 +26,21 @@ async def health_check():
 
 
 @app.get("/api/movies/")
-async def list_movies():
-    if is_routed_to_microservice():
-        movie_list = await monolith.list_movies()
-    else:
-        movie_list = await movies.list_movies()
+async def list_movies(id: Optional[str] = None):
+    if id is None:
+        if is_routed_to_microservice():
+            movie_list = await monolith.list_movies()
+        else:
+            movie_list = await movies.list_movies()
 
-    return JSONResponse(movie_list)
+        return JSONResponse(movie_list)
+    else:
+        if is_routed_to_microservice():
+            found_movie = await monolith.get_movie(id)
+        else:
+            found_movie = await movies.get_movie(id)
+
+        return JSONResponse(found_movie)
 
 
 @app.post("/api/movies/")
@@ -44,19 +53,12 @@ async def create_movie(request: Request):
     return JSONResponse(created_movie, status_code=201)
 
 
-@app.get("/api/movies/")
-async def get_movie(id: str):
-    if is_routed_to_microservice():
-        found_movie = await monolith.get_movie(id)
-    else:
-        found_movie = await movies.get_movie(id)
-
-    return JSONResponse(found_movie)
-
-
 @app.get("/api/users/")
-async def list_users():
-    return JSONResponse(await monolith.list_users())
+async def list_users(id: Optional[str] = None):
+    if id is None:
+        return JSONResponse(await monolith.list_users())
+    else:
+        return JSONResponse(await monolith.get_user(id))
 
 
 @app.post("/api/users/")
@@ -64,8 +66,3 @@ async def create_user(request: Request):
     return JSONResponse(
         await monolith.create_user(await request.json()), status_code=201
     )
-
-
-@app.get("/api/users/")
-async def get_user(id: str):
-    return JSONResponse(await monolith.get_user(id))

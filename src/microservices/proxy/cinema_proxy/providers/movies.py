@@ -20,5 +20,5 @@ async def create_movie(data):
 
 async def get_movie(id: str):
     async with httpx.AsyncClient() as client:
-        response = await client.get(url=MOVIES_SERVICE_URL + "/api/movies" + "?id={id}")
+        response = await client.get(url=MOVIES_SERVICE_URL + "/api/movies" + f"?id={id}")
         return json.loads(response.text)

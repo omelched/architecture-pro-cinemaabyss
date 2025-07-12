@@ -19,7 +19,7 @@ async def create_movie(data):
 
 async def get_movie(id: str):
     async with httpx.AsyncClient() as client:
-        response = await client.get(url=MONOLITH_URL + "/api/movies" + "?id={id}")
+        response = await client.get(url=MONOLITH_URL + "/api/movies" + f"?id={id}")
         return json.loads(response.text)
 
 
@@ -35,5 +35,5 @@ async def create_user(data):
 
 async def get_user(id: str):
     async with httpx.AsyncClient() as client:
-        response = await client.get(url=MONOLITH_URL + "/api/users" + "?id={id}")
+        response = await client.get(url=MONOLITH_URL + "/api/users" + f"?id={id}")
         return json.loads(response.text)
