@@ -1,0 +1,47 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(customer, "Пользователь", "Пользователь сервиса Cinema Abyss")
+Container_Ext(acquiring, "Эквайринговые сервисы", "Внешние сервисы по обработке платежей")
+
+System_Boundary(cinema, "Cinema Abyss") {
+    Person(admin, "Администратор", "Администратор сервиса Cinema Abyss")
+    
+    Container(frontend, "Пользовательское Веб-приложение", "VueJS", "Отрисовывает пользовательский интерфейс как SPA-приложение")
+    Container(bff, "Бэкенд для фронтенда", "Python, FastAPI", "Обрабатывает запросы пользователя, собирает и трансформирует запросы для упрощения frontend")
+    Container(streamer, "Стриминг видео", "Python, FastAPI", "Стримит видеофайлы")
+
+    Container(cinemateque, "Кино-тека", "Python, Django", "Управляет состоянием кино-библиотеки (метаданные фильмов)")
+    Container(suggester, "Движок рекомендаций", "Python, FastAPI, ElasticSearch", "Рекомендует фильмы пользователям")
+    Container(accounts, "Профили и данные пользователей", "Python, Django", "Хранит УЗ пользователей, их права, списки избранного и т.д.")
+    Container(payments, "Платежи", "Python, Django", "Хранит платежные данные и подписки пользователей")
+
+    ContainerQueue(rabbitMQ, "Брокер очереди сообщений", "AMPQ", "Управляет очередью сообщений")
+    ContainerDb(postgresql, "СУБД", "PostgreSQL", "Кластер СУБД для нескольких БД")
+    
+}
+
+Rel(customer, frontend, "Взаимодействует с приложением")
+Rel(customer, streamer, "Получает потоковые данные", "UDP")
+Rel(admin, frontend, "Администрирует приложение")
+Rel(frontend, bff, "Запрашивает актуальное состояние", "HTTP, REST API")
+
+Rel(bff, cinemateque, "Запрашивает и управляет метаданными фильмов", "HTTP, REST API")
+Rel(bff, suggester, "Запрашивает рекомендации", "HTTP, REST API")
+Rel(bff, accounts, "Проверяет наличие прав доступа", "HTTP, REST API")
+Rel(bff, accounts, "Запрашивает и управляет УЗ", "HTTP, REST API")
+Rel(bff, payments, "Запрашивает счета на оплату", "HTTP, REST API")
+
+Rel(payments, acquiring, "Взаимодействует с платежными системами", "HTTP, REST API")
+
+Rel(streamer, accounts, "Проверяет наличие прав доступа", "HTTP, REST API")
+
+Rel(cinemateque, rabbitMQ, "Публикует изменения в метаданных фильмов", "AMPQ")
+Rel(rabbitMQ, suggester, "Подписывается на изменения в метаданных фильмов", "AMPQ")
+Rel(payments, rabbitMQ, "Публикует изменения в счетах на оплату", "AMPQ")
+Rel(rabbitMQ, accounts, "Подписывается на изменения в счетах на оплату", "AMPQ")
+
+Rel(cinemateque, postgresql, "Выполняет операции чтения/записи", "SQL")
+Rel(accounts, postgresql, "Выполняет операции чтения/записи", "SQL")
+
+@enduml
